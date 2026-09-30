@@ -5,3 +5,6 @@ export async function apiGet(path: string) {
   if (!res.ok) throw new Error('API error')
   return res.json()
 }
+
+// Note: feature modules should keep their own service wrappers and
+// call this shared client for network requests.
