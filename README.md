@@ -1,3 +1,95 @@
+Further docs: see `docs/TEAM_GIT_WORKFLOW.md`.
+
+## Frontend structure (detailed)
+
+The frontend code lives in `frontend/src`. Team members should work inside their assigned feature folder (see ownership mapping below).
+
+frontend/src/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── auth/
+│   │   ├── login/page.tsx
+│   │   └── register/page.tsx
+│   ├── products/
+│   │   ├── page.tsx
+│   │   └── [id]/page.tsx
+│   ├── cart/page.tsx
+│   ├── checkout/page.tsx
+│   ├── payment/page.tsx
+│   └── orders/
+│       ├── page.tsx
+│       ├── [id]/page.tsx
+│       └── confirmation/page.tsx
+|
+├── features/
+│   ├── auth/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   ├── product/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   ├── product-detail/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   ├── cart/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── stores/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   ├── order/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   ├── payment/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types/index.ts
+│   │   └── index.ts
+│   └── order-history/
+│       ├── components/
+│       ├── hooks/
+│       ├── services/
+│       ├── types/index.ts
+│       └── index.ts
+|
+├── components/
+│   ├── ui/
+│   ├── layout/
+│   └── common/
+|
+├── services/
+│   └── api/index.ts
+|
+├── hooks/
+├── stores/
+├── types/
+└── lib/
+
+### Ownership mapping (7 members)
+- Member 1 (auth): `features/auth/` and `app/auth/` (login/register)
+- Member 2 (product): `features/product/` and `app/products/` (product list)
+- Member 3 (product-detail): `features/product-detail/` and `app/products/[id]/` (product details)
+- Member 4 (cart): `features/cart/` and `app/cart/` (cart functionality)
+- Member 5 (order): `features/order/` and `app/checkout/` (checkout flow)
+- Member 6 (payment): `features/payment/` and `app/payment/` (payment flow)
+- Member 7 (order-history): `features/order-history/` and `app/orders/` (orders & history)
+
+Follow the repository rules: shared API client in `src/services/api/`, shared UI in `src/components/`, and each feature should export a public surface from `index.ts`.
 # BrewLite
 
 BrewLite is a university Software Engineering project: a minimal e-commerce prototype for learning full-stack development.
