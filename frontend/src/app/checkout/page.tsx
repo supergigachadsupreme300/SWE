@@ -39,7 +39,6 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<OrderItem[]>([])
   const [discount, setDiscount] = useState<number>(0)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [stockCheckDemoMode, setStockCheckDemoMode] = useState<boolean>(false)
 
   const { submitOrder, isLoading, error, order, isSuccess, reset } = useCreateOrder()
 
@@ -142,11 +141,6 @@ export default function CheckoutPage() {
       return
     }
 
-    if (stockCheckDemoMode) {
-      alert('Mô phỏng Sprint 2: Sản phẩm "Caramel Macchiato Đặc Biệt" không đủ tồn kho (Stock = 0)!')
-      return
-    }
-
     const payload: OrderCreatePayload = {
       items: items.map((it) => ({
         productId: it.productId,
@@ -235,29 +229,14 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Demo Toggle: Stock validation simulation */}
+          {items.length === 0 && (
             <button
-              type="button"
-              onClick={() => setStockCheckDemoMode(!stockCheckDemoMode)}
-              className={`text-xs px-3 py-1.5 rounded-xl font-semibold border transition-all ${
-                stockCheckDemoMode
-                  ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-xs'
-                  : 'bg-stone-100 border-stone-200 text-stone-600 hover:bg-stone-200'
-              }`}
+              onClick={handleResetToSample}
+              className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-xl transition-colors self-start"
             >
-              {stockCheckDemoMode ? '🔴 Đang bật test: Hết tồn kho' : '⚪ Test lỗi tồn kho'}
+              + Nạp lại đồ uống mẫu
             </button>
-
-            {items.length === 0 && (
-              <button
-                onClick={handleResetToSample}
-                className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-xl transition-colors"
-              >
-                + Nạp lại đồ uống mẫu
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Global Error Banner */}

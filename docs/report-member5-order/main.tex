@@ -121,7 +121,7 @@ Theo phân công (README), Member 5 chịu trách nhiệm:
   \item \textbf{Backend:} \texttt{modules/orders/} — controller, service, DTO (NestJS)
 \end{itemize}
 
-Phạm vi chức năng của Member 5: Quản lý thực thể Order và OrderItem, xây dựng giao diện Checkout, xác thực (validation) thông tin khách, review và cho phép chỉnh sửa/thêm/xóa món trực tiếp trong đơn, tính toán tổng tiền, gửi đơn hàng (\texttt{POST /orders}), kiểm tra tồn kho \& trừ kho nguyên tử trong transaction, và quản lý vòng đời trạng thái đơn hàng (Order State Machine theo Mục 9.1). Phần lưu trữ lịch sử và theo dõi đơn sau khi hoàn tất thuộc phạm vi Member 7 (\texttt{order-history}).
+Phạm vi chức năng của Member 5: Quản lý thực thể Order và OrderItem, xây dựng giao diện Checkout, xác thực (validation) thông tin khách, review và cho phép chỉnh sửa/thêm/xóa món trực tiếp trong đơn, tính toán tổng tiền, gửi đơn hàng (\texttt{POST /orders}), kiểm tra tồn kho \& trừ kho nguyên tử trong transaction, và quản lý vòng đời trạng thái đơn hàng (Order State Machine theo Mục 9.1). Sau khi tạo đơn ở trạng thái \texttt{PENDING}, màn hình xác nhận chuyển tiếp (handover) sang Module Payment của Member 6 (\texttt{/payment?orderId=...}) để xử lý giao dịch không tiền mặt. Phần lưu trữ lịch sử và theo dõi đơn tại quầy sau khi hoàn tất thuộc phạm vi Member 7 (\texttt{order-history}).
 
 \subsection{Quy trình Agile Scrum}
 

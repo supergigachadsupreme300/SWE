@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import type { OrderDetail } from '../types'
 import { formatCurrency } from './OrderItemCard'
 
@@ -135,15 +136,29 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="pt-4">
-          <button
-            type="button"
-            onClick={() => (onContinueShopping ? onContinueShopping() : (window.location.href = '/'))}
-            className="w-full py-3.5 px-4 rounded-xl bg-amber-800 hover:bg-amber-900 text-white font-semibold text-sm transition-colors text-center shadow-xs"
-          >
-            ← Hoàn tất \& Đặt đơn mới
-          </button>
+        {/* Action Buttons: Bridge to Member 6 Payment & Order New */}
+        <div className="pt-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href={`/payment?orderId=${order.id}&amount=${order.total}`}
+              className="flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white font-semibold text-sm text-center shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <span>Tiến hành thanh toán</span>
+              <span>→</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => (onContinueShopping ? onContinueShopping() : (window.location.href = '/'))}
+              className="py-3.5 px-5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-sm transition-colors text-center"
+            >
+              ← Đặt thêm đơn
+            </button>
+          </div>
+
+          <p className="text-[11px] text-stone-400 text-center italic">
+            💡 Giao diện cổng thanh toán (QR MoMo/VietQR) được xử lý bởi Thành viên 6 (Module Payment).
+          </p>
         </div>
       </div>
     </div>

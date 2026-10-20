@@ -74,11 +74,11 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 space-y-6">
+    <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-4 sm:p-5 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+      <div className="flex items-center justify-between pb-2.5 border-b border-stone-100">
         <div>
-          <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
+          <h3 className="text-sm sm:text-base font-bold text-stone-900 flex items-center gap-1.5">
             <span>☕</span> Danh sách món đã chọn
           </h3>
           <p className="text-[11px] text-stone-500 mt-0.5">

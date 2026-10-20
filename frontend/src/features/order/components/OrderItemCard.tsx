@@ -25,9 +25,9 @@ export const OrderItemCard: React.FC<OrderItemCardProps> = ({
   onRemove,
 }) => {
   return (
-    <div className="flex items-center gap-3.5 py-3.5 border-b border-stone-200/80 last:border-b-0 hover:bg-stone-50/60 transition-colors rounded-xl px-2">
-      {/* Product Image / Icon */}
-      <div className="relative w-13 h-13 rounded-xl overflow-hidden bg-gradient-to-br from-amber-100 to-amber-200/60 flex items-center justify-center shrink-0 border border-amber-200/50 shadow-xs">
+    <div className="flex items-center gap-2.5 py-2 px-1 border-b border-stone-100 last:border-b-0 hover:bg-stone-50/70 transition-colors rounded-lg">
+      {/* Product Image / Icon - Compact 10x10 */}
+      <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-amber-100 to-amber-200/60 flex items-center justify-center shrink-0 border border-amber-200/50 shadow-2xs">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -35,7 +35,7 @@ export const OrderItemCard: React.FC<OrderItemCardProps> = ({
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-2xl" role="img" aria-label="Coffee">
+          <span className="text-lg" role="img" aria-label="Coffee">
             ☕
           </span>
         )}
@@ -43,46 +43,46 @@ export const OrderItemCard: React.FC<OrderItemCardProps> = ({
 
       {/* Details */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="text-sm font-semibold text-stone-900 truncate">
+        <div className="flex items-center justify-between gap-2">
+          <h4 className="text-xs sm:text-sm font-semibold text-stone-900 truncate">
             {item.name}
           </h4>
-          <span className="text-sm font-bold text-amber-900 whitespace-nowrap">
+          <span className="text-xs sm:text-sm font-bold text-amber-900 whitespace-nowrap">
             {formatCurrency(item.lineTotal)}
           </span>
         </div>
 
-        <div className="flex items-center justify-between mt-1.5">
-          <div className="flex items-center gap-2 text-xs text-stone-500">
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex items-center gap-1.5 text-[11px] text-stone-500">
             {item.size && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md font-semibold bg-amber-50 text-amber-800 border border-amber-200/70 text-[11px]">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-amber-50 text-amber-800 border border-amber-200/60 text-[10px]">
                 Size {item.size}
               </span>
             )}
-            <span>{formatCurrency(item.price)}/món</span>
+            <span>{formatCurrency(item.price)}</span>
           </div>
 
-          {/* Quantity Controls / Actions (Review & Edit mode) */}
+          {/* Compact Quantity Controls */}
           {!readOnly && onQuantityChange ? (
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50 overflow-hidden shadow-2xs">
+            <div className="flex items-center gap-1">
+              <div className="flex items-center border border-stone-200 rounded-md bg-stone-50 overflow-hidden shadow-2xs">
                 <button
                   type="button"
                   onClick={() => onQuantityChange(-1)}
                   disabled={item.quantity <= 1}
-                  className="w-6 h-6 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-stone-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                  title="Giảm số lượng"
+                  className="w-5 h-5 flex items-center justify-center text-[11px] font-bold text-stone-600 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Giảm"
                 >
                   -
                 </button>
-                <span className="px-2 text-xs font-bold text-stone-900 min-w-5 text-center">
+                <span className="px-1 text-[11px] font-bold text-stone-900 min-w-4 text-center">
                   {item.quantity}
                 </span>
                 <button
                   type="button"
                   onClick={() => onQuantityChange(1)}
-                  className="w-6 h-6 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-stone-200 transition-colors"
-                  title="Tăng số lượng"
+                  className="w-5 h-5 flex items-center justify-center text-[11px] font-bold text-stone-600 hover:bg-stone-200 transition-colors"
+                  title="Tăng"
                 >
                   +
                 </button>
@@ -92,15 +92,15 @@ export const OrderItemCard: React.FC<OrderItemCardProps> = ({
                 <button
                   type="button"
                   onClick={onRemove}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors text-xs"
-                  title="Xóa món này"
+                  className="w-5 h-5 flex items-center justify-center rounded text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors text-[11px]"
+                  title="Xóa món"
                 >
-                  🗑️
+                  ✕
                 </button>
               )}
             </div>
           ) : (
-            <span className="text-xs font-medium text-stone-500">
+            <span className="text-xs font-semibold text-stone-500">
               &times; {item.quantity}
             </span>
           )}
