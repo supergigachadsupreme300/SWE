@@ -703,6 +703,29 @@ Sprint 2       & US-04, US-05, US-06 (11 SP) \\
   \item Velocity: 11/11 SP = 100\%.
 \end{enumerate}
 
+\subsection{Kết quả kiểm thử tự động (Automated Test Execution)}
+
+Để đảm bảo chất lượng phần mềm trước khi nghiệm thu, Member 5 đã xây dựng và thực thi bộ kiểm thử tự động bao quát toàn bộ Business Rules, Order State Machine (Mục 9.1), và Validation nhận tại quầy:
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp kết quả kiểm thử tự động (33/33 Tests Passed — 100\%)}
+\small
+\begin{tabularx}{\textwidth}{lXcc}
+\toprule
+\textbf{Suite} & \textbf{Nội dung kiểm thử} & \textbf{Số test} & \textbf{Kết quả} \\
+\midrule
+Suite 1 & Business Rules: Tính giá, lineTotal, tăng/giảm \& xóa món (BR-01, 02, 06) & 5 & 100\% Pass \\
+Suite 2 & Order State Machine Mục 9.1: Happy path, Retry, Cancelled \& chặn chuyển sai & 12 & 100\% Pass \\
+Suite 3 & Tồn kho: Kiểm tra stock và trừ kho nguyên tử trong Prisma transaction & 3 & 100\% Pass \\
+Suite 4 & Validation form: Regex SĐT 10 số, số bàn DINE\_IN \& mang đi & 7 & 100\% Pass \\
+Backend & Unit test OrdersService \& assertTransition (Node.js native test runner) & 6 & 100\% Pass \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Đồng thời, quá trình build tĩnh trên cả hai môi trường Frontend (\texttt{next build} — 12 routes) và Backend (\texttt{tsc -p tsconfig.build.json}) đều hoàn tất với 0 lỗi, bảo đảm chất lượng chuyển giao.
+
 \subsection{Sprint Retrospective}
 
 \begin{table}[H]
@@ -712,10 +735,10 @@ Sprint 2       & US-04, US-05, US-06 (11 SP) \\
 \toprule
 \textbf{Làm tốt} & \textbf{Cần cải thiện} \\
 \midrule
-Feature-based architecture rõ ràng & Cần viết unit test cho service layer \\
-Git workflow (feature branch + PR) hiệu quả & Nên setup CI/CD sớm hơn \\
-Prisma transaction đảm bảo data integrity & Documentation API cần chi tiết hơn \\
-Commit message nhất quán & Sync thường xuyên hơn với members khác \\
+Feature-based architecture rõ ràng & Nên cấu hình CI/CD pipeline tự động hóa sớm hơn \\
+Git workflow (feature branch + PR) hiệu quả & Documentation API giữa các module cần sync liên tục \\
+Prisma transaction đảm bảo tính toàn vẹn dữ liệu & Phối hợp test tích hợp end-to-end cùng Member 6 (Payment) \\
+Bộ test tự động 33 ca đạt tỉ lệ pass 100\% & Mở rộng thêm stress test cho tải đặt món cao điểm \\
 \bottomrule
 \end{tabularx}
 \end{table}
