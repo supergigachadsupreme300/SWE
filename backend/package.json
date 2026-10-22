@@ -6,6 +6,7 @@
     "start": "node dist/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "build": "tsc -p tsconfig.build.json",
+    "test": "node --test test/orders.service.test.mjs",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {

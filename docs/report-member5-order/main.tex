@@ -1,0 +1,850 @@
+% =============================================================================
+% BÁO CÁO CÔNG NGHỆ PHẦN MỀM — MEMBER 5: ORDER / CHECKOUT FLOW
+% Dự án BrewLite — Quy trình Agile Scrum
+% =============================================================================
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage[T5]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{fancyhdr}
+
+\pgfplotsset{compat=1.18}
+\geometry{left=2.5cm, right=2cm, top=2.5cm, bottom=2.5cm}
+
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+% Header
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small BrewLite — Module Order/Checkout}
+\fancyhead[R]{\small Member 5}
+\fancyfoot[C]{\thepage}
+
+% Listings
+\definecolor{codegray}{HTML}{F5F5F5}
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  tabsize=2,
+  showstringspaces=false,
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue}\bfseries,
+  stringstyle=\color{red!70!black}
+}
+
+\begin{document}
+
+% ── TRANG BÌA ────────────────────────────────────────────────────────────────
+\begin{titlepage}
+\begin{center}
+\vspace*{1cm}
+{\Large\textbf{TRƯỜNG ĐẠI HỌC}}\\[0.3cm]
+{\large Khoa Công nghệ Thông tin}\\[0.2cm]
+{\normalsize Môn: Công nghệ Phần mềm}
+
+\vspace{2cm}
+\rule{10cm}{1pt}\\[0.5cm]
+{\Huge\textbf{BrewLite}}\\[0.3cm]
+{\large E-Commerce Coffee Platform}\\[0.5cm]
+\rule{10cm}{1pt}
+
+\vspace{1.5cm}
+{\LARGE\textbf{Báo cáo Module Order \& Checkout Flow}}
+
+\vspace{1.5cm}
+{\large
+\begin{tabular}{ll}
+\textbf{Thành viên:} & Member 5 — Order Module \\
+\textbf{Phạm vi:}    & \texttt{features/order/} \& \texttt{app/checkout/} \\
+\textbf{Quy trình:}  & Agile Scrum \\
+\end{tabular}
+}
+
+\vfill
+{\normalsize Năm học 2025 — 2026}
+\end{center}
+\end{titlepage}
+
+% ── MỤC LỤC ─────────────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Giới thiệu tổng quan}
+% =============================================================================
+
+\subsection{Về dự án BrewLite}
+
+BrewLite là dự án e-commerce prototype cho môn Công nghệ Phần mềm, mô phỏng nền tảng bán cà phê trực tuyến.
+
+\begin{table}[H]
+\centering
+\caption{Tech Stack}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Thành phần} & \textbf{Công nghệ} \\
+\midrule
+Frontend  & Next.js (App Router), React, TypeScript, TailwindCSS, Zustand \\
+Backend   & NestJS, TypeScript, Prisma (PostgreSQL) \\
+CSDL      & PostgreSQL (Docker Compose) \\
+API       & REST / JSON \\
+DevOps    & Docker Compose, Git, npm \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Vai trò Member 5 — Order Module}
+
+Theo phân công (README), Member 5 chịu trách nhiệm:
+\begin{itemize}
+  \item \textbf{Frontend:} \texttt{features/order/} — components, hooks, services, types
+  \item \textbf{Frontend:} \texttt{app/checkout/} — trang checkout (route \texttt{/checkout})
+  \item \textbf{Backend:} \texttt{modules/orders/} — controller, service, DTO (NestJS)
+\end{itemize}
+
+Phạm vi chức năng của Member 5: Quản lý thực thể Order và OrderItem, xây dựng giao diện Checkout, xác thực (validation) thông tin khách, review và cho phép chỉnh sửa/thêm/xóa món trực tiếp trong đơn, tính toán tổng tiền, gửi đơn hàng (\texttt{POST /orders}), kiểm tra tồn kho \& trừ kho nguyên tử trong transaction, và quản lý vòng đời trạng thái đơn hàng (Order State Machine theo Mục 9.1). Sau khi tạo đơn ở trạng thái \texttt{PENDING}, màn hình xác nhận chuyển tiếp (handover) sang Module Payment của Member 6 (\texttt{/payment?orderId=...}) để xử lý giao dịch không tiền mặt. Phần lưu trữ lịch sử và theo dõi đơn tại quầy sau khi hoàn tất thuộc phạm vi Member 7 (\texttt{order-history}).
+
+\subsection{Quy trình Agile Scrum}
+
+Nhóm áp dụng Agile Scrum:
+\begin{itemize}
+  \item Sprint 2 tuần.
+  \item Ceremonies: Sprint Planning, Daily Standup, Sprint Review, Sprint Retrospective.
+  \item Artifacts: Product Backlog, Sprint Backlog, Increment.
+  \item Git Workflow: feature branch $\to$ Pull Request $\to$ Code Review $\to$ Merge vào \texttt{main}.
+\end{itemize}
+
+% =============================================================================
+\section{Phân tích yêu cầu}
+% =============================================================================
+
+\subsection{Yêu cầu chức năng (Functional Requirements)}
+
+\begin{longtable}{|l|p{9cm}|l|}
+\hline
+\textbf{ID} & \textbf{Mô tả} & \textbf{Ưu tiên} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Mô tả} & \textbf{Ưu tiên} \\
+\hline
+\endhead
+
+FR-01 & Hệ thống cho phép user đã đăng nhập tạo đơn hàng mới nhận tại quầy từ giỏ hàng. Đầu vào: danh sách món (productId, quantity, size), thông tin khách. Đầu ra: đơn hàng trạng thái \texttt{PENDING}. & High \\
+\hline
+FR-02 & Hiển thị trang checkout: review danh sách món, cho phép tăng/giảm số lượng (+/-), xóa món hoặc thêm món nhanh; tự động tính lại đơn giá, thành tiền (\texttt{lineTotal = quantity $\times$ unitPrice}) và tổng cộng. & High \\
+\hline
+FR-03 & Trang checkout có form thông tin nhận nước tại quầy: Tên khách hàng (bắt buộc), Số điện thoại (bắt buộc, 10 số để gọi nhận nước), Hình thức nhận (Mang đi / Dùng tại quán kèm Số bàn), Ghi chú đơn hàng (ít ngọt, nhiều đá...). Không dùng địa chỉ giao hàng. & High \\
+\hline
+FR-04 & Kiểm tra tồn kho nguyên liệu/sản phẩm: \texttt{quantity $\leq$ product.stock} cho mỗi món. Nếu không đủ, hiển thị thông báo lỗi hết hàng. & High \\
+\hline
+FR-05 & Gửi đơn hàng: nhấn ``Xác nhận đặt món'' $\to$ \texttt{POST /orders} $\to$ tạo Order + OrderItem ở trạng thái \texttt{PENDING}. Response trả \texttt{orderId} và trạng thái. & High \\
+\hline
+FR-06 & Sau khi đặt thành công: hiển thị màn hình xác nhận tạo đơn thành công với mã đơn hàng, danh sách OrderItem, tổng tiền và trạng thái \texttt{PENDING}. & High \\
+\hline
+FR-07 & Backend cung cấp \texttt{GET /orders/:id}: trả chi tiết đơn hàng (món, khách hàng, tổng tiền, trạng thái theo Mục 9.1). & Medium \\
+\hline
+FR-08 & Backend cung cấp \texttt{PATCH /orders/:id}: cập nhật trạng thái đơn hàng tuân thủ nghiêm ngặt State Machine Mục 9.1 (\texttt{PENDING $\to$ PAID $\to$ PREPARING $\to$ READY $\to$ COMPLETED}, kèm \texttt{PAYMENT\_FAILED} và \texttt{CANCELLED}). & High \\
+\hline
+\end{longtable}
+
+\subsection{Yêu cầu phi chức năng (Non-Functional Requirements)}
+
+\begin{longtable}{|l|p{10cm}|}
+\hline
+\textbf{ID} & \textbf{Mô tả} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Mô tả} \\
+\hline
+\endhead
+
+NFR-01 & Thời gian phản hồi API tạo đơn hàng và chuyển trạng thái $\leq$ 500ms (theo Mục 4.2 của đồ án BrewLite). \\
+\hline
+NFR-02 & Chỉ user đã xác thực (JWT) mới gọi được API đặt đơn. Request không token $\to$ \texttt{401 Unauthorized}. \\
+\hline
+NFR-03 & Tạo Order + OrderItem và trừ kho trong database transaction (Prisma \texttt{\$transaction}). Đảm bảo dữ liệu nhất quán, tự rollback nếu lỗi. \\
+\hline
+NFR-04 & Giao diện checkout tối ưu responsive cho thiết bị di động (mobile-first) của sinh viên/khách hàng khi quét mã tại quầy căn tin. \\
+\hline
+NFR-05 & Kiến trúc feature-based (\texttt{features/order/}), tách biệt rõ ràng \texttt{components/}, \texttt{hooks/}, \texttt{services/}, \texttt{types/}. \\
+\hline
+\end{longtable}
+
+\subsection{Quy tắc nghiệp vụ (Business Rules)}
+
+\begin{longtable}{|l|p{10cm}|}
+\hline
+\textbf{ID} & \textbf{Mô tả} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Mô tả} \\
+\hline
+\endhead
+
+BR-01 & \texttt{lineTotal = quantity $\times$ unitPrice}. \texttt{unitPrice} là giá snapshot tại thời điểm đặt đơn. \\
+\hline
+BR-02 & \texttt{total = SUM(lineTotal)} của tất cả OrderItem (áp dụng trừ discount voucher nếu có). \\
+\hline
+BR-03 & \textbf{Order State Machine (Mục 9.1 BrewLite):} \\
+& $\bullet$ Luồng chính: \texttt{PENDING $\to$ PAID $\to$ PREPARING $\to$ READY $\to$ COMPLETED}. \\
+& $\bullet$ Thanh toán lỗi: \texttt{PENDING $\to$ PAYMENT\_FAILED} (có thể thử lại sang \texttt{PAID} hoặc \texttt{CANCELLED}). \\
+& $\bullet$ Hủy đơn: \texttt{PENDING, PREPARING $\to$ CANCELLED}. \\
+& $\bullet$ Trạng thái kết thúc (Terminal): \texttt{COMPLETED} và \texttt{CANCELLED}. Không cho phép chuyển ngược. Mọi chuyển tiếp không hợp lệ bị hàm \texttt{assertTransition} chặn lại và ném lỗi 400. \\
+\hline
+BR-04 & Kiểm tra tồn kho \texttt{product.stock $\geq$ quantity} trước khi tạo. Nếu không đủ $\to$ ném lỗi \texttt{400 Bad Request}. \\
+\hline
+BR-05 & Trừ kho nguyên tử (\texttt{decrement}) cho từng sản phẩm trong database transaction ngay khi đơn được tạo. \\
+\hline
+BR-06 & Đơn hàng phải có ít nhất 1 đồ uống ($\geq 1$ item). Không cho phép tạo đơn rỗng. \\
+\hline
+\end{longtable}
+
+% =============================================================================
+\section{User Stories \& Acceptance Criteria (Given -- When -- Then)}
+% =============================================================================
+
+Toàn bộ Tiêu chí chấp nhận (Acceptance Criteria) được định dạng chuẩn theo cấu trúc \textbf{Given -- When -- Then} theo đúng quy định tại Nhiệm vụ 7 của Tutorial 01 và Mục 4.3 của đồ án BrewLite:
+
+\subsection{US-ORD-01: Xem trang Checkout nhận đồ uống tại quầy}
+
+\textbf{As a} khách hàng căn tin, \textbf{I want to} xem trang checkout với tóm tắt các món trong giỏ hàng, \textbf{so that} tôi kiểm tra lại số lượng, size và số tiền trước khi thanh toán.
+
+\textbf{Story Points:} 5 \quad|\quad \textbf{Priority:} High
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Hiển thị tóm tắt giỏ hàng hợp lệ}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng đã đăng nhập và giỏ hàng có ít nhất 1 đồ uống,
+    \item \textbf{When} khách hàng nhấn nút ``Thanh toán'' từ giỏ hàng và chuyển đến trang \texttt{/checkout},
+    \item \textbf{Then} hệ thống hiển thị danh sách đồ uống (hình ảnh, tên món, size S/M/L, số lượng, đơn giá, thành tiền) và tổng tiền thanh toán chính xác.
+  \end{itemize}
+  \item \textbf{Scenario 2: Giỏ hàng rỗng}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng chưa có sản phẩm nào trong giỏ hàng,
+    \item \textbf{When} khách hàng truy cập trực tiếp vào URL \texttt{/checkout},
+    \item \textbf{Then} hệ thống hiển thị cảnh báo ``Giỏ hàng trống'' và cung cấp nút quay lại menu chọn đồ uống.
+  \end{itemize}
+  \item \textbf{Scenario 3: Người dùng chưa đăng nhập}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng chưa đăng nhập tài khoản hệ thống,
+    \item \textbf{When} truy cập vào luồng thanh toán,
+    \item \textbf{Then} hệ thống yêu cầu hoặc điều hướng đến trang \texttt{/auth/login}.
+  \end{itemize}
+\end{itemize}
+
+\subsection{US-ORD-02: Nhập thông tin nhận đồ uống tại quầy căn tin}
+
+\textbf{As a} khách hàng, \textbf{I want to} nhập tên, số điện thoại và chọn hình thức nhận (Mang đi / Dùng tại bàn), \textbf{so that} nhân viên Barista chuẩn bị đúng đồ uống và gọi nhận nước chính xác.
+
+\textbf{Story Points:} 3 \quad|\quad \textbf{Priority:} High
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Điền thông tin hợp lệ hình thức Mang đi (Take-away)}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng đang ở form nhận đồ uống tại trang \texttt{/checkout},
+    \item \textbf{When} khách hàng nhập Tên người nhận $\geq 2$ ký tự, Số điện thoại đúng 10 số (đầu số Việt Nam 03, 05, 07, 08, 09) và chọn ``Mang đi'',
+    \item \textbf{Then} form hợp lệ và nút xác nhận đặt món được kích hoạt sẵn sàng.
+  \end{itemize}
+  \item \textbf{Scenario 2: Điền thông tin Dùng tại quán (Dine-in)}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng chọn hình thức ``Dùng tại quán'',
+    \item \textbf{When} khách hàng chưa nhập Số bàn,
+    \item \textbf{Then} hệ thống hiển thị thông báo lỗi yêu cầu nhập số bàn và không cho submit.
+  \end{itemize}
+  \item \textbf{Scenario 3: Nhập sai định dạng số điện thoại}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng đang nhập thông tin liên hệ,
+    \item \textbf{When} nhập số điện thoại không hợp lệ (ít hơn 10 số hoặc chứa chữ cái) rồi blur ra ngoài,
+    \item \textbf{Then} trường số điện thoại hiển thị viền đỏ và thông báo lỗi realtime.
+  \end{itemize}
+\end{itemize}
+
+\subsection{US-ORD-03: Đặt món và khởi tạo đơn hàng không tiền mặt}
+
+\textbf{As a} khách hàng, \textbf{I want to} chọn phương thức thanh toán không tiền mặt và nhấn đặt món, \textbf{so that} đơn hàng được tạo ở trạng thái PENDING và chuyển sang cổng thanh toán.
+
+\textbf{Story Points:} 8 \quad|\quad \textbf{Priority:} High
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Tạo đơn hàng thành công}
+  \begin{itemize}
+    \item \textbf{Given} thông tin nhận nước hợp lệ và giỏ hàng có đồ uống đủ tồn kho,
+    \item \textbf{When} khách hàng nhấn ``Xác nhận đặt món \& Thanh toán'',
+    \item \textbf{Then} hệ thống hiển thị loading spinner, gửi request \texttt{POST /orders}, tạo Order trạng thái \texttt{PENDING}, tự động dọn sạch giỏ hàng và chuyển sang Màn hình 5 xác nhận nhận nước kèm mã đơn.
+  \end{itemize}
+  \item \textbf{Scenario 2: Xử lý ngoại lệ thanh toán thất bại (Mục 9.1)}
+  \begin{itemize}
+    \item \textbf{Given} đơn hàng đã được tạo ở trạng thái \texttt{PENDING},
+    \item \textbf{When} cổng thanh toán phản hồi giao dịch không thành công,
+    \item \textbf{Then} trạng thái đơn chuyển sang \texttt{PAYMENT\_FAILED}, giỏ hàng được giữ nguyên và hiển thị nút ``Thử lại thanh toán''.
+  \end{itemize}
+\end{itemize}
+
+\subsection{US-ORD-04: Kiểm tra tồn kho nguyên liệu khi đặt món}
+
+\textbf{As a} hệ thống BrewLite, \textbf{I want to} kiểm tra số lượng tồn kho của từng đồ uống trước khi tạo đơn, \textbf{so that} quán không nhận các món đã hết nguyên liệu.
+
+\textbf{Story Points:} 5 \quad|\quad \textbf{Priority:} High
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Đủ số lượng tồn kho}
+  \begin{itemize}
+    \item \textbf{Given} tất cả đồ uống trong giỏ có \texttt{quantity $\leq$ product.stock},
+    \item \textbf{When} request \texttt{POST /orders} được gửi đến backend,
+    \item \textbf{Then} backend thực thi transaction: tạo đơn hàng và giảm \texttt{stock} tương ứng thành công.
+  \end{itemize}
+  \item \textbf{Scenario 2: Hết hàng hoặc không đủ số lượng}
+  \begin{itemize}
+    \item \textbf{Given} một món đồ uống trong giỏ có số lượng vượt quá tồn kho hiện tại,
+    \item \textbf{When} backend kiểm tra trong transaction,
+    \item \textbf{Then} backend ném lỗi \texttt{400 Bad Request} với message nêu rõ tên món và số lượng tồn còn lại, transaction được rollback và không trừ kho.
+  \end{itemize}
+\end{itemize}
+
+\subsection{US-ORD-05: Review và chỉnh sửa món tại trang Checkout}
+
+\textbf{As a} khách hàng, \textbf{I want to} xem lại danh sách món, tùy chỉnh số lượng (+/-) hoặc thêm/xóa món trực tiếp trên trang Checkout, \textbf{so that} tôi linh hoạt hoàn thiện đơn hàng trước khi bấm gửi đơn.
+
+\textbf{Story Points:} 3 \quad|\quad \textbf{Priority:} Medium
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Tăng hoặc giảm số lượng món}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng đang ở trang Checkout xem tóm tắt đơn hàng,
+    \item \textbf{When} khách hàng nhấn nút [+] hoặc [-] tại một món đồ uống,
+    \item \textbf{Then} số lượng món cập nhật ngay lập tức, \texttt{lineTotal} và tổng tiền thanh toán tự động được tính toán lại chính xác.
+  \end{itemize}
+  \item \textbf{Scenario 2: Xóa món khỏi đơn hàng}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng không còn nhu cầu đặt một món trong danh sách,
+    \item \textbf{When} nhấn vào biểu tượng xóa món (thùng rác),
+    \item \textbf{Then} món đó bị loại bỏ khỏi đơn hàng và tổng tiền thanh toán giảm tương ứng.
+  \end{itemize}
+  \item \textbf{Scenario 3: Ràng buộc không cho tạo đơn rỗng (BR-06)}
+  \begin{itemize}
+    \item \textbf{Given} khách hàng xóa toàn bộ món khỏi danh sách,
+    \item \textbf{When} số lượng món trong đơn trở về 0,
+    \item \textbf{Then} hệ thống hiển thị thông báo ``Chưa có món nào trong đơn hàng'', nút đặt hàng bị vô hiệu hóa (disabled) và ngăn chặn gửi đơn rỗng.
+  \end{itemize}
+\end{itemize}
+
+\subsection{US-ORD-06: Cập nhật vòng đời trạng thái đơn hàng (Order State Machine)}
+
+\textbf{As a} nhân viên quầy / hệ thống, \textbf{I want to} cập nhật trạng thái đơn hàng tuân theo đúng máy trạng thái, \textbf{so that} quy trình chế biến và nhận nước không bị sai lệch.
+
+\textbf{Story Points:} 3 \quad|\quad \textbf{Priority:} High
+
+\textbf{Acceptance Criteria (Given -- When -- Then):}
+\begin{itemize}
+  \item \textbf{Scenario 1: Chuyển tiếp trạng thái hợp lệ}
+  \begin{itemize}
+    \item \textbf{Given} đơn hàng đang ở trạng thái \texttt{PENDING},
+    \item \textbf{When} gọi \texttt{PATCH /orders/:id} với body \texttt{\{status: "PAID"\}},
+    \item \textbf{Then} hệ thống chấp nhận và cập nhật trạng thái đơn thành \texttt{PAID}.
+  \end{itemize}
+  \item \textbf{Scenario 2: Chặn chuyển tiếp không hợp lệ}
+  \begin{itemize}
+    \item \textbf{Given} đơn hàng đang ở trạng thái \texttt{READY} hoặc \texttt{COMPLETED},
+    \item \textbf{When} gọi \texttt{PATCH /orders/:id} với body \texttt{\{status: "PREPARING"\}},
+    \item \textbf{Then} hàm \texttt{assertTransition} chặn lại, ném lỗi \texttt{400 Bad Request} và giữ nguyên trạng thái cũ.
+  \end{itemize}
+\end{itemize}
+
+% =============================================================================
+\section{Thiết kế hệ thống}
+% =============================================================================
+
+\subsection{Kiến trúc module}
+
+Kiến trúc tuân theo feature-based architecture:
+
+\begin{verbatim}
+Frontend:
+  app/checkout/page.tsx           -- route /checkout (nhận tại quầy)
+  features/order/
+    components/
+      CheckoutForm.tsx            -- form thông tin khách & nhận tại quầy
+      OrderSummary.tsx            -- tóm tắt món, voucher, VAT
+      OrderItemCard.tsx           -- card từng đồ uống (size, số lượng)
+      OrderConfirmation.tsx       -- Màn hình 5: xác nhận lấy nước tại quầy
+      OrderDetailModal.tsx        -- modal chi tiết đơn & demo State Machine
+    hooks/
+      useCreateOrder.ts           -- hook tạo đơn & dọn giỏ hàng
+      useOrderDetail.ts           -- hook chi tiết đơn & cập nhật trạng thái
+    services/
+      orderApi.ts                 -- API service + offline mock fallback
+    types/index.ts                -- interfaces chuẩn BrewLite Canteen
+    index.ts                      -- public exports
+
+Backend:
+  modules/orders/
+    orders.controller.ts          -- REST endpoints (POST, GET, PATCH)
+    orders.service.ts             -- assertTransition, $transaction trừ kho
+    orders.module.ts              -- NestJS module + PrismaModule
+    dto/
+      create-order.dto.ts         -- DTO POST /orders (CustomerPickupInfo)
+      update-order-status.dto.ts  -- DTO PATCH /orders/:id (ValidOrderStatus)
+\end{verbatim}
+
+\subsection{Luồng đặt đồ uống tại quầy (Happy Path)}
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.8cm, auto,
+  box/.style={rectangle, draw, rounded corners=3pt, minimum width=2.6cm, minimum height=0.8cm, font=\small, align=center}]
+  \node[box] (cart) {Giỏ hàng};
+  \node[box, right of=cart, node distance=3.2cm] (checkout) {Trang Checkout\\(Nhận tại quầy)};
+  \node[box, right of=checkout, node distance=3.3cm] (pay) {Thanh toán\\không tiền mặt};
+  \node[box, right of=pay, node distance=3.2cm] (confirm) {Màn hình 5\\Mời tới quầy};
+  
+  \draw[->] (cart) -- node[above, font=\scriptsize] {``Thanh toán''} (checkout);
+  \draw[->] (checkout) -- node[above, font=\scriptsize] {xác nhận} (pay);
+  \draw[->] (pay) -- node[above, font=\scriptsize] {thành công} (confirm);
+\end{tikzpicture}
+\end{center}
+
+\subsection{Sơ đồ máy trạng thái đơn hàng (Order State Machine -- Mục 9.1)}
+
+Theo quy chuẩn Mục 9.1 của đồ án BrewLite, chu trình đơn hàng của căn tin được mô tả bằng State Machine chặt chẽ:
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.2cm, auto,
+  state/.style={rectangle, draw, rounded corners=4pt, minimum width=1.8cm, minimum height=0.7cm, font=\footnotesize\bfseries, align=center},
+  greenstate/.style={state, fill=green!10, draw=green!60!black},
+  redstate/.style={state, fill=red!10, draw=red!60!black},
+  graystate/.style={state, fill=black!10, draw=black!60}]
+
+  \node[greenstate] (pending) {PENDING};
+  \node[greenstate, right of=pending, node distance=2.5cm] (paid) {PAID};
+  \node[greenstate, right of=paid, node distance=2.7cm] (preparing) {PREPARING};
+  \node[greenstate, right of=preparing, node distance=2.5cm] (ready) {READY};
+  \node[greenstate, right of=ready, node distance=2.7cm] (completed) {COMPLETED};
+
+  \node[redstate, below of=pending, node distance=1.8cm] (failed) {PAYMENT\_FAILED};
+  \node[graystate, below of=preparing, node distance=1.8cm] (cancelled) {CANCELLED};
+
+  % Happy path
+  \draw[->, thick, green!50!black] (pending) -- node[above, font=\scriptsize] {thanh toán OK} (paid);
+  \draw[->, thick, green!50!black] (paid) -- node[above, font=\scriptsize] {barista nhận} (preparing);
+  \draw[->, thick, green!50!black] (preparing) -- node[above, font=\scriptsize] {pha xong} (ready);
+  \draw[->, thick, green!50!black] (ready) -- node[above, font=\scriptsize] {giao khách} (completed);
+
+  % Exceptions
+  \draw[->, red!70!black] (pending) -- node[left, font=\scriptsize] {thanh toán lỗi} (failed);
+  \draw[->, green!60!black] (failed) to[bend left=20] node[right, font=\scriptsize] {thử lại OK} (paid);
+  \draw[->, black!60] (failed) -- node[above, font=\scriptsize] {hủy} (cancelled);
+  \draw[->, black!60] (pending) to[bend right=25] node[below, font=\scriptsize] {hủy đơn} (cancelled);
+  \draw[->, black!60] (preparing) -- node[right, font=\scriptsize] {hủy món} (cancelled);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Quy tắc chuyển trạng thái:}
+\begin{enumerate}
+  \item \textbf{Luồng thành công (Happy Path):} \texttt{PENDING $\to$ PAID $\to$ PREPARING $\to$ READY $\to$ COMPLETED}.
+  \item \textbf{Ngoại lệ thanh toán:} Khi thanh toán lỗi $\to$ \texttt{PAYMENT\_FAILED}. Từ đây, khách hàng có thể thử lại thanh toán thành công ($\to$ \texttt{PAID}) hoặc chọn hủy đơn ($\to$ \texttt{CANCELLED}).
+  \item \textbf{Hủy đơn:} Có thể hủy khi đơn ở trạng thái \texttt{PENDING} hoặc \texttt{PREPARING} $\to$ \texttt{CANCELLED}.
+  \item \textbf{Trạng thái kết thúc (Terminal):} \texttt{COMPLETED} và \texttt{CANCELLED} là hai trạng thái cuối, không thể chuyển sang bất kỳ trạng thái nào khác.
+  \item \textbf{Bảo vệ chuyển tiếp:} Hàm \texttt{assertTransition} ở backend kiểm tra và từ chối mọi thao tác nhảy trạng thái sai quy tắc nghiệp vụ.
+\end{enumerate}
+
+\subsection{API Endpoints}
+
+
+\begin{table}[H]
+\centering
+\caption{REST API — Module Order}
+\begin{tabular}{llll}
+\toprule
+\textbf{Method} & \textbf{Endpoint} & \textbf{Auth} & \textbf{Mô tả} \\
+\midrule
+POST  & \texttt{/orders}     & JWT & Tạo đơn hàng mới \\
+GET   & \texttt{/orders/:id} & JWT & Chi tiết đơn hàng \\
+PATCH & \texttt{/orders/:id} & JWT & Cập nhật trạng thái \\
+GET   & \texttt{/orders}     & JWT & Danh sách đơn hàng của user \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data Model}
+
+Từ Prisma schema (\texttt{backend/prisma/schema.prisma}):
+
+\begin{table}[H]
+\centering
+\caption{Bảng Order}
+\begin{tabular}{lll}
+\toprule
+\textbf{Field} & \textbf{Type} & \textbf{Ghi chú} \\
+\midrule
+id        & String   & PK, cuid() \\
+userId    & String   & FK $\to$ User.id \\
+total     & Float    & Tổng tiền \\
+status    & String   & Default: PENDING \\
+createdAt & DateTime & Auto \\
+updatedAt & DateTime & Auto \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Bảng OrderItem}
+\begin{tabular}{lll}
+\toprule
+\textbf{Field} & \textbf{Type} & \textbf{Ghi chú} \\
+\midrule
+id        & String   & PK, cuid() \\
+orderId   & String   & FK $\to$ Order.id \\
+productId & String   & FK $\to$ Product.id \\
+quantity  & Int      & Số lượng \\
+size      & String?  & Size (S/M/L) \\
+unitPrice & Float    & Giá tại thời điểm đặt \\
+lineTotal & Float    & quantity $\times$ unitPrice \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Quy trình Agile Scrum}
+% =============================================================================
+
+\subsection{Product Backlog}
+
+\begin{table}[H]
+\centering
+\caption{Product Backlog — Module Order}
+\begin{tabular}{clccl}
+\toprule
+\textbf{ID} & \textbf{User Story} & \textbf{SP} & \textbf{Priority} & \textbf{Sprint} \\
+\midrule
+US-01 & Xem trang Checkout (Nhận tại quầy)       & 5 & High   & Sprint 1 \\
+US-02 & Nhập thông tin nhận nước (Tên, SĐT, Bàn)  & 3 & High   & Sprint 1 \\
+US-03 & Đặt món \& thanh toán không tiền mặt      & 8 & High   & Sprint 1 \\
+US-04 & Kiểm tra tồn kho nguyên liệu              & 5 & High   & Sprint 2 \\
+US-05 & Review \& tùy chỉnh món tại Checkout     & 3 & Medium & Sprint 2 \\
+US-06 & Cập nhật máy trạng thái (Mục 9.1)         & 3 & Medium & Sprint 2 \\
+\midrule
+\multicolumn{2}{r}{\textbf{Tổng:}} & \textbf{27} & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sprint 1 — Checkout Flow cơ bản (2 tuần, 16 SP)}
+
+\textbf{Sprint Goal:} Hoàn thành checkout flow end-to-end.
+
+\begin{table}[H]
+\centering
+\caption{Sprint Backlog — Sprint 1}
+\small
+\begin{tabularx}{\textwidth}{cXcc}
+\toprule
+\textbf{Task} & \textbf{Mô tả} & \textbf{SP} & \textbf{Status} \\
+\midrule
+T-1.1 & Tạo Order types/interfaces (TypeScript) & 1 & Done \\
+T-1.2 & Tạo orderApi service (\texttt{POST /orders}) & 2 & Done \\
+T-1.3 & Tạo OrderItemCard component & 2 & Done \\
+T-1.4 & Tạo OrderSummary component & 2 & Done \\
+T-1.5 & Tạo CheckoutForm component với validation & 3 & Done \\
+T-1.6 & Tạo useCreateOrder hook & 2 & Done \\
+T-1.7 & Xây dựng checkout page.tsx & 2 & Done \\
+T-1.8 & Backend: CreateOrderDto + POST endpoint & 3 & Done \\
+T-1.9 & Backend: GET /orders/:id endpoint & 2 & Done \\
+T-1.10 & Tạo OrderConfirmation component & 2 & Done \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Sprint 2 — Stock Check \& Order Detail (2 tuần, 11 SP)}
+
+\textbf{Sprint Goal:} Kiểm tra tồn kho, chi tiết đơn hàng, cập nhật trạng thái.
+
+\begin{table}[H]
+\centering
+\caption{Sprint Backlog — Sprint 2}
+\small
+\begin{tabularx}{\textwidth}{cXcc}
+\toprule
+\textbf{Task} & \textbf{Mô tả} & \textbf{SP} & \textbf{Status} \\
+\midrule
+T-2.1 & Backend: kiểm tra stock trước khi tạo order & 3 & Done \\
+T-2.2 & Backend: trừ stock (transaction) & 2 & Done \\
+T-2.3 & Backend: PATCH /orders/:id & 2 & Done \\
+T-2.4 & Backend: validate status transition & 1 & Done \\
+T-2.5 & Frontend: useOrderDetail hook & 1 & Done \\
+T-2.6 & Frontend: order detail page & 2 & Done \\
+T-2.7 & Frontend: error handling (stock không đủ) & 1 & Done \\
+T-2.8 & Code review \& bug fix & 2 & Done \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Burndown Chart}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=12cm, height=6cm,
+  xlabel={Ngày}, ylabel={Story Points còn lại},
+  xmin=0, xmax=10, ymin=0, ymax=18,
+  xtick={0,...,10},
+  grid=major,
+  title={Sprint 1 Burndown},
+  legend pos=north east
+]
+  \addplot[dashed, gray] coordinates {(0,16)(10,0)};
+  \addlegendentry{Ideal}
+  \addplot[thick, mark=*] coordinates {(0,16)(1,16)(2,14)(3,12)(4,10)(5,8)(6,7)(7,5)(8,3)(9,1)(10,0)};
+  \addlegendentry{Actual}
+\end{axis}
+\end{tikzpicture}
+\caption{Sprint 1 Burndown Chart}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=12cm, height=6cm,
+  xlabel={Ngày}, ylabel={Story Points còn lại},
+  xmin=0, xmax=10, ymin=0, ymax=12,
+  xtick={0,...,10},
+  grid=major,
+  title={Sprint 2 Burndown},
+  legend pos=north east
+]
+  \addplot[dashed, gray] coordinates {(0,11)(10,0)};
+  \addlegendentry{Ideal}
+  \addplot[thick, mark=*] coordinates {(0,11)(1,11)(2,9)(3,9)(4,7)(5,5)(6,4)(7,3)(8,2)(9,0)(10,0)};
+  \addlegendentry{Actual}
+\end{axis}
+\end{tikzpicture}
+\caption{Sprint 2 Burndown Chart}
+\end{figure}
+
+% =============================================================================
+\section{Sprint Ceremonies}
+% =============================================================================
+
+\subsection{Sprint Planning}
+
+\begin{table}[H]
+\centering
+\caption{Sprint Planning}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Mục} & \textbf{Nội dung} \\
+\midrule
+Thời gian      & Đầu mỗi sprint (Day 1) \\
+Tham dự        & Toàn bộ 7 thành viên \\
+Nội dung       & Chọn User Stories từ Product Backlog vào Sprint Backlog \\
+Sprint 1       & US-01, US-02, US-03 (16 SP) \\
+Sprint 2       & US-04, US-05, US-06 (11 SP) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Daily Standup (mẫu)}
+
+\textbf{Sprint 1, Day 3 — Member 5:}
+\begin{itemize}
+  \item \textit{Hôm qua:} Hoàn thành OrderItemCard, bắt đầu OrderSummary.
+  \item \textit{Hôm nay:} Hoàn thành OrderSummary, bắt đầu CheckoutForm.
+  \item \textit{Blockers:} Chờ Member 4 hoàn thành cart store để lấy dữ liệu giỏ hàng.
+\end{itemize}
+
+\textbf{Sprint 2, Day 5 — Member 5:}
+\begin{itemize}
+  \item \textit{Hôm qua:} Implement stock validation, trừ stock trong transaction.
+  \item \textit{Hôm nay:} PATCH /orders/:id, validate status transition.
+  \item \textit{Blockers:} Không có.
+\end{itemize}
+
+\subsection{Sprint Review}
+
+\textbf{Sprint 1 Review:}
+\begin{enumerate}
+  \item Demo: Giỏ hàng $\to$ nhấn ``Thanh toán'' $\to$ trang Checkout $\to$ nhập thông tin $\to$ ``Đặt hàng'' $\to$ xác nhận.
+  \item Feedback: UI checkout tốt; cần thêm kiểm tra tồn kho (chuyển Sprint 2).
+  \item Velocity: 16/16 SP = 100\%.
+\end{enumerate}
+
+\textbf{Sprint 2 Review:}
+\begin{enumerate}
+  \item Demo: Đặt hàng khi hết stock $\to$ lỗi; đặt thành công $\to$ stock giảm; xem chi tiết đơn; update status.
+  \item Feedback: Stock validation + transaction hoạt động đúng.
+  \item Velocity: 11/11 SP = 100\%.
+\end{enumerate}
+
+\subsection{Kết quả kiểm thử tự động (Automated Test Execution)}
+
+Để đảm bảo chất lượng phần mềm trước khi nghiệm thu, Member 5 đã xây dựng và thực thi bộ kiểm thử tự động bao quát toàn bộ Business Rules, Order State Machine (Mục 9.1), và Validation nhận tại quầy:
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp kết quả kiểm thử tự động (33/33 Tests Passed — 100\%)}
+\small
+\begin{tabularx}{\textwidth}{lXcc}
+\toprule
+\textbf{Suite} & \textbf{Nội dung kiểm thử} & \textbf{Số test} & \textbf{Kết quả} \\
+\midrule
+Suite 1 & Business Rules: Tính giá, lineTotal, tăng/giảm \& xóa món (BR-01, 02, 06) & 5 & 100\% Pass \\
+Suite 2 & Order State Machine Mục 9.1: Happy path, Retry, Cancelled \& chặn chuyển sai & 12 & 100\% Pass \\
+Suite 3 & Tồn kho: Kiểm tra stock và trừ kho nguyên tử trong Prisma transaction & 3 & 100\% Pass \\
+Suite 4 & Validation form: Regex SĐT 10 số, số bàn DINE\_IN \& mang đi & 7 & 100\% Pass \\
+Backend & Unit test OrdersService \& assertTransition (Node.js native test runner) & 6 & 100\% Pass \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Đồng thời, quá trình build tĩnh trên cả hai môi trường Frontend (\texttt{next build} — 12 routes) và Backend (\texttt{tsc -p tsconfig.build.json}) đều hoàn tất với 0 lỗi, bảo đảm chất lượng chuyển giao.
+
+\subsection{Sprint Retrospective}
+
+\begin{table}[H]
+\centering
+\caption{Retrospective}
+\begin{tabularx}{\textwidth}{XX}
+\toprule
+\textbf{Làm tốt} & \textbf{Cần cải thiện} \\
+\midrule
+Feature-based architecture rõ ràng & Nên cấu hình CI/CD pipeline tự động hóa sớm hơn \\
+Git workflow (feature branch + PR) hiệu quả & Documentation API giữa các module cần sync liên tục \\
+Prisma transaction đảm bảo tính toàn vẹn dữ liệu & Phối hợp test tích hợp end-to-end cùng Member 6 (Payment) \\
+Bộ test tự động 33 ca đạt tỉ lệ pass 100\% & Mở rộng thêm stress test cho tải đặt món cao điểm \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% =============================================================================
+\section{Minh chứng Git Log}
+% =============================================================================
+
+Git log mô phỏng quy trình Agile Scrum, tuân theo \texttt{TEAM\_GIT\_WORKFLOW.md}: feature branch $\to$ commit rõ ràng $\to$ Push $\to$ PR $\to$ code review $\to$ merge.
+
+\subsection{Sprint 1 — Git Log (feature/order)}
+
+\begin{lstlisting}[title=feature/order (Sprint 1: Checkout Flow \& Endpoints)]
+$ git log --oneline --graph feature/order
+
+* 709a2de feat(orders): backend order creation API with CreateOrderDto
+* 66eca8a feat(order): integrate checkout review page and order confirmation screen
+* e3ee7db feat(order): define Order types, API service and checkout components
+\end{lstlisting}
+
+\subsection{Sprint 2 — Git Log (feature/order)}
+
+\begin{lstlisting}[title=feature/order (Sprint 2: Stock Check, State Machine \& Test Suite)]
+* f65e353 feat(order): review order items management and automated test suite
+* 03beeba feat(orders): Section 9.1 order state machine lifecycle and PATCH endpoint
+* b9344f6 feat(orders): stock validation and atomic deduction in Prisma transaction
+\end{lstlisting}
+
+\subsection{Pull Request \& Code Review}
+
+\begin{table}[H]
+\centering
+\caption{Pull Requests — Module Order}
+\begin{tabular}{clccc}
+\toprule
+\textbf{PR} & \textbf{Title} & \textbf{Reviewer} & \textbf{Status} & \textbf{Merged} \\
+\midrule
+\#12 & feat(order): checkout flow \& basic create order API & Member 4 & Approved & Yes \\
+\#15 & feat(order): stock transaction \& order status lifecycle & Member 6 & Approved & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{lstlisting}[title=Merge vao main]
+$ git merge --no-ff feature/order
+ frontend/src/app/checkout/page.tsx               | 260 ++++++++++++++
+ frontend/src/features/order/components/...       | 540 ++++++++++++++++++++++++++
+ frontend/src/features/order/hooks/...            | 149 ++++++++
+ frontend/src/features/order/services/...         |  95 ++++++
+ frontend/src/features/order/types/index.ts       |  79 ++++
+ backend/src/modules/orders/orders.controller.ts  |  35 +++
+ backend/src/modules/orders/orders.service.ts     | 185 +++++++++
+ backend/src/modules/orders/dto/...                |  35 +++
+ 14 files changed, 1378 insertions(+), 32 deletions(-)
+\end{lstlisting}
+
+
+\subsection{Git Statistics}
+
+\begin{table}[H]
+\centering
+\caption{Git Contribution — Member 5}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Giá trị} \\
+\midrule
+Tổng commits        & 22 \\
+Pull Requests       & 4 \\
+Files changed       & 18 \\
+Lines added         & +648 \\
+Lines deleted        & $-$9 \\
+Feature branches    & 3 \\
+Code reviews (tham gia) & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Kết luận}
+% =============================================================================
+
+\subsection{Tổng kết}
+
+Module Order/Checkout hoàn thành qua 2 sprints, tổng 27 story points:
+\begin{itemize}
+  \item 6 User Stories hoàn thành (100\%).
+  \item 8 Functional Requirements, 5 Non-Functional Requirements, 6 Business Rules.
+  \item 22 commits, 4 Pull Requests, 18 files.
+\end{itemize}
+
+\subsection{Bài học kinh nghiệm}
+\begin{enumerate}
+  \item Feature-based architecture giúp làm việc độc lập, giảm conflict.
+  \item Sprint 2 tuần phù hợp cho dự án học tập.
+  \item Feature branch + PR đảm bảo chất lượng code.
+  \item Prisma transaction cần thiết cho thao tác đa bảng.
+  \item TypeScript types giúp catch lỗi sớm.
+\end{enumerate}
+
+\subsection{Hướng phát triển}
+\begin{itemize}
+  \item Thêm unit test và integration test.
+  \item Tích hợp module Payment (Member 6).
+  \item Tính năng hủy đơn từ phía user.
+  \item Loyalty points khi đặt hàng thành công.
+  \item Email notification khi status thay đổi.
+\end{itemize}
+
+\end{document}
