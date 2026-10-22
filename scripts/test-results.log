@@ -1,0 +1,44 @@
+﻿
+[1m[36m================================================================[0m
+[1mΓÿò BREWLITE ΓÇö AUTOMATED TEST SUITE (MEMBER 5: ORDER & STATE MACHINE)[0m
+[36m================================================================[0m
+
+[1mSuite 1: Business Rules (BR-01, BR-02, BR-06) - Pricing & Item Review/Edit[0m
+  [32mΓ£ô PASS[0m - BR-01: lineTotal = quantity * unitPrice (2 * 45k = 90k)
+  [32mΓ£ô PASS[0m - BR-02: Total equals sum of line totals (90k + 55k = 145k)
+  [32mΓ£ô PASS[0m - US-ORD-05: Increasing item quantity (2 -> 3) updates lineTotal (135k)
+  [32mΓ£ô PASS[0m - US-ORD-05: Deleting an item updates order total accordingly
+  [32mΓ£ô PASS[0m - BR-06: System rejects order with 0 items
+
+[1mSuite 2: Section 9.1 - BrewLite Order State Machine (Canteen Counter Pickup)[0m
+  [32mΓ£ô PASS[0m - Happy path 1: PENDING -> PAID (Kh├ích thanh to├ín th├ánh c├┤ng)
+  [32mΓ£ô PASS[0m - Happy path 2: PAID -> PREPARING (Barista tiß║┐p nhß║¡n pha chß║┐)
+  [32mΓ£ô PASS[0m - Happy path 3: PREPARING -> READY (Pha xong - Mß╗¥i tß╗¢i quß║ºy lß║Ñy n╞░ß╗¢c)
+  [32mΓ£ô PASS[0m - Happy path 4: READY -> COMPLETED (Kh├ích ─æ├ú nhß║¡n n╞░ß╗¢c tß║íi quß║ºy)
+  [32mΓ£ô PASS[0m - Exception 1: PENDING -> PAYMENT_FAILED (Thanh to├ín lß╗ùi)
+  [32mΓ£ô PASS[0m - Exception 2: PAYMENT_FAILED -> PAID (Kh├ích thß╗¡ lß║íi thanh to├ín th├ánh c├┤ng)
+  [32mΓ£ô PASS[0m - Exception 3: PENDING -> CANCELLED (Hß╗ºy tr╞░ß╗¢c khi trß║ú tiß╗ün)
+  [32mΓ£ô PASS[0m - Exception 4: PREPARING -> CANCELLED (Hß╗ºy trong qu├í tr├¼nh pha chß║┐)
+  [32mΓ£ô PASS[0m - Blocked: COMPLETED -> PENDING (Terminal state kh├┤ng thß╗â chuyß╗ân ng╞░ß╗úc)
+  [32mΓ£ô PASS[0m - Blocked: CANCELLED -> PAID (─É├ú hß╗ºy kh├┤ng thß╗â thanh to├ín)
+  [32mΓ£ô PASS[0m - Blocked: READY -> PREPARING (Kh├┤ng thß╗â quay lß║íi pha chß║┐)
+  [32mΓ£ô PASS[0m - Blocked: PAID -> READY (Bß║»t buß╗Öc phß║úi qua PREPARING)
+
+[1mSuite 3: Business Rules (BR-04, BR-05) - Inventory Stock Verification[0m
+  [32mΓ£ô PASS[0m - BR-04: Order accepted when stock (5) >= quantity (2)
+  [32mΓ£ô PASS[0m - BR-04: Order rejected when stock (1) < quantity (3)
+  [32mΓ£ô PASS[0m - BR-05: Product stock automatically decremented (5 - 2 = 3)
+
+[1mSuite 4: User Story (US-ORD-02) - Canteen Counter Pickup Form Validation[0m
+  [32mΓ£ô PASS[0m - Valid VN Phone: 0912345678 is ACCEPTED
+  [32mΓ£ô PASS[0m - Valid VN Phone: 0389998888 is ACCEPTED
+  [32mΓ£ô PASS[0m - Invalid Short Phone: 12345 is REJECTED
+  [32mΓ£ô PASS[0m - Invalid Prefix Phone: 0123456789 is REJECTED
+  [32mΓ£ô PASS[0m - Pickup AT_COUNTER does not require table number
+  [32mΓ£ô PASS[0m - DINE_IN with table number is valid
+  [32mΓ£ô PASS[0m - DINE_IN without table number is REJECTED
+
+[36m----------------------------------------------------------------[0m
+Test Results: [32m27 Passed[0m, [0m0 Failed
+[32m[1mΓ£ô ALL TEST CASES PASSED SUCCESSFULLY (100%) ACCORDING TO BREWLITE SPEC![0m
+
