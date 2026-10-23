@@ -1,0 +1,548 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-1111-4abc-9def-000000000001",
+    "name": "BrewLite API",
+    "description": "API tests for the implemented BrewLite backend endpoints.\n\nRun order: Products -> Orders. The collection stores productId and orderId from responses, but ships with seed defaults so individual folders can run on their own.\n\nPrerequisites:\n- PostgreSQL running and seeded (`backend/prisma/seed.mjs`)\n- Backend running on http://localhost:8000\n\nSelect the `BrewLite Local` environment (or keep the collection baseUrl variable).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Placeholders",
+      "item": [
+        {
+          "name": "Auth ping",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns auth placeholder message', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('auth placeholder');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/ping",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "ping"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cart ping",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns cart placeholder message', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('cart placeholder');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["cart"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Payments ping",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns payments placeholder message', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('payments placeholder');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Users ping",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns users placeholder message', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('users endpoint placeholder');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns a non-empty product array', () => {",
+                  "  pm.expect(body).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('products expose id, name and price', () => {",
+                  "  body.slice(0, 3).forEach((product) => {",
+                  "    pm.expect(product).to.have.property('id');",
+                  "    pm.expect(product).to.have.property('name');",
+                  "    pm.expect(product).to.have.property('price');",
+                  "  });",
+                  "});",
+                  "",
+                  "if (Array.isArray(body) && body.length > 0) {",
+                  "  pm.collectionVariables.set('productId', body[0].id);",
+                  "  pm.collectionVariables.set('productUnitPrice', body[0].price);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get product detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const requestedId = pm.collectionVariables.get('productId');",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns the requested product', () => {",
+                  "  pm.expect(body.id).to.eql(requestedId);",
+                  "});",
+                  "pm.test('product has a numeric price and stock', () => {",
+                  "  pm.expect(body.price).to.be.a('number');",
+                  "  pm.expect(body.stock).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get related products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const productId = pm.collectionVariables.get('productId');",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns an array', () => {",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});",
+                  "pm.test('respects the limit query (max 4)', () => {",
+                  "  pm.expect(body.length).to.be.at.most(4);",
+                  "});",
+                  "pm.test('excludes the source product', () => {",
+                  "  pm.expect(body.map((product) => product.id)).to.not.include(productId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}/related?limit=4",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}", "related"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get missing product returns 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 Not Found', () => pm.response.to.have.status(404));",
+                  "pm.test('returns a JSON error message', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/postman-missing-product",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "postman-missing-product"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('created (200 or 201)', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test('returns an order id', () => {",
+                  "  pm.expect(body).to.have.property('id');",
+                  "});",
+                  "pm.test('initial status is PENDING', () => {",
+                  "  pm.expect(body.status).to.eql('PENDING');",
+                  "});",
+                  "pm.test('returns the order items', () => {",
+                  "  pm.expect(body.items).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "if (body && body.id) {",
+                  "  pm.collectionVariables.set('orderId', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 1,\n      \"size\": \"M\",\n      \"unitPrice\": {{productUnitPrice}},\n      \"lineTotal\": {{productUnitPrice}}\n    }\n  ],\n  \"total\": {{productUnitPrice}},\n  \"customerInfo\": {\n    \"customerName\": \"Postman Tester\",\n    \"customerPhone\": \"0912345678\",\n    \"pickupType\": \"AT_COUNTER\",\n    \"note\": \"Created by the BrewLite Postman collection\"\n  },\n  \"paymentMethod\": \"MOMO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get order by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const orderId = pm.collectionVariables.get('orderId');",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns the created order', () => {",
+                  "  pm.expect(body.id).to.eql(orderId);",
+                  "});",
+                  "pm.test('order includes items', () => {",
+                  "  pm.expect(body.items).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "{{orderId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const orderId = pm.collectionVariables.get('orderId');",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('returns an array of orders', () => {",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (orderId) {",
+                  "  pm.test('contains the created order', () => {",
+                  "    pm.expect(body.map((order) => order.id)).to.include(orderId);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update order status PENDING -> PAID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('transitioned to PAID', () => {",
+                  "  pm.expect(body.status).to.eql('PAID');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "{{orderId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject invalid transition PAID -> READY",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('error name is Bad Request', () => {",
+                  "  pm.expect(pm.response.json().error).to.eql('Bad Request');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"READY\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "{{orderId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject order with empty items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('returns a JSON error message', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [],\n  \"total\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "prod_macchiato_01",
+      "type": "string"
+    },
+    {
+      "key": "productUnitPrice",
+      "value": "49000",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
