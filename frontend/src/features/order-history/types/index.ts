@@ -1,5 +1,8 @@
-export type OrderSummary = {
-  id: string
-  total: number
-  createdAt: string
+import type { OrderDetail, OrderStatus } from '../../order/types'
+
+export type { OrderDetail, OrderStatus }
+
+export interface OrderHistoryFilters {
+  keyword: string
+  status: OrderStatus | 'ALL'
 }
