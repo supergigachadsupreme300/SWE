@@ -4,7 +4,12 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model User {
@@ -16,6 +21,7 @@ model User {
   orders        Order[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  role Role @default(USER)
 }
 
 model Product {
@@ -86,4 +92,15 @@ model CartItem {
   updatedAt DateTime @updatedAt
 
   @@unique([cartId, productId])
+}
+
+model LoginLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([email])
 }

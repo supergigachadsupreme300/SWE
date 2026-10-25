@@ -1,6 +1,11 @@
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
 
-const prisma = new PrismaClient()
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+})
 
 async function main() {
   console.log('🌱 Đang nạp dữ liệu mẫu (Seed Data) vào cơ sở dữ liệu BrewLite...')
@@ -59,6 +64,7 @@ async function main() {
       price: 42000,
       stock: 35,
     },
+    
   ]
 
   for (const prod of products) {
@@ -109,9 +115,34 @@ async function main() {
   } else {
     console.log(`ℹ Đã có đơn hàng mẫu trong hệ thống (ID: ${existingOrder.id})`)
   }
-
-  console.log('\n🎉 Hoàn thành nạp dữ liệu mẫu!')
+   console.log('\n🎉 Hoàn thành nạp dữ liệu mẫu!')
+ // 4. Tạo tài khoản admin (email phải trùng ADMIN_EMAILS trong .env)
+   const adminEmail = (process.env.ADMIN_EMAILS ?? 'admin@example.com')
+    .split(',')[0]
+    .trim()
+    .toLowerCase()
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      name: 'Admin',
+      password: await bcrypt.hash('Admin@123', 10),
+    },
+  })
+  console.log(`✓ Đã tạo/cập nhật Admin: ${admin.email}`)
 }
+
+await prisma.user.upsert({
+  where: { email: 'admin@example.com' },
+  update: {},
+  create: {
+    email: 'admin@example.com',
+    name: 'Admin',
+    password: await bcrypt.hash('Admin@123', 10),
+  },
+})
+await prisma.$disconnect()
 
 main()
   .catch((e) => {
