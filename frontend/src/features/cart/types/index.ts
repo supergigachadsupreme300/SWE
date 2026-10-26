@@ -1,6 +1,9 @@
 export type AddToCartDTO = {
   productId: string
   quantity: number
+  size?: string
+  toppings?: string[]
+  unitPrice?: number
 }
 
 export type CartItem = {
@@ -10,6 +13,8 @@ export type CartItem = {
   stock: number
   quantity: number
   imageUrl: string | null
+  size?: string
+  toppings?: string[]
 }
 
 export type CartActionResult = {

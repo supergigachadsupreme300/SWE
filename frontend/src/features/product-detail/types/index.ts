@@ -21,6 +21,9 @@ export type StockState = 'in-stock' | 'low-stock' | 'out-of-stock'
 export type AddToCartRequest = {
   productId: string
   quantity: number
+  size?: string
+  toppings?: string[]
+  unitPrice?: number
 }
 
 export type AddToCartStatus = 'idle' | 'pending' | 'success' | 'unavailable' | 'error'

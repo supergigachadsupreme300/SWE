@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -57,6 +58,7 @@ model OrderItem {
   productId String
   quantity  Int
   size      String?
+  toppings  String?
   unitPrice Float
   lineTotal Float
   createdAt DateTime @default(now())

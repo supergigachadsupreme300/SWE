@@ -85,7 +85,10 @@ export const useCartStore = create<CartState>()(
         }
 
         const current = get().items.find(
-          (item) => item.productId === input.productId,
+          (item) =>
+            item.productId === input.productId &&
+            item.size === input.size &&
+            JSON.stringify(item.toppings ?? []) === JSON.stringify(input.toppings ?? []),
         )
 
         const nextQuantity =
@@ -110,9 +113,11 @@ export const useCartStore = create<CartState>()(
                     ...item,
                     quantity: nextQuantity,
                     stock: product.stock,
-                    unitPrice: product.unitPrice,
+                    unitPrice: typeof input.unitPrice === 'number' ? input.unitPrice : product.unitPrice,
                     name: product.name,
                     imageUrl: product.imageUrl ?? null,
+                    size: input.size,
+                    toppings: input.toppings,
                   }
                 : item,
             ),
@@ -123,11 +128,14 @@ export const useCartStore = create<CartState>()(
             items: [
               ...state.items,
               {
-                productId: product.productId,name: product.name,
-                unitPrice: product.unitPrice,
+                productId: product.productId,
+                name: product.name,
+                unitPrice: typeof input.unitPrice === 'number' ? input.unitPrice : product.unitPrice,
                 stock: product.stock,
                 quantity: input.quantity,
                 imageUrl: product.imageUrl ?? null,
+                size: input.size,
+                toppings: input.toppings,
               },
             ],
           }))

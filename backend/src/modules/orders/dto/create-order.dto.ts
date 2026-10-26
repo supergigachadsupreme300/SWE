@@ -2,6 +2,7 @@ export class CreateOrderItemDto {
   productId: string
   quantity: number
   size?: string
+  toppings?: string[]
   unitPrice: number
   lineTotal?: number
 }

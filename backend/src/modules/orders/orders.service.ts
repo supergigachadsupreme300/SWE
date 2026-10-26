@@ -92,6 +92,7 @@ export class OrdersService {
               productId: item.productId,
               quantity: item.quantity,
               size: item.size || null,
+              toppings: Array.isArray(item.toppings) ? item.toppings.join(',') : item.toppings || null,
               unitPrice: item.unitPrice,
               lineTotal: item.lineTotal ?? item.quantity * item.unitPrice,
             })),

@@ -3,7 +3,8 @@ import Link from 'next/link';
 
 export default async function ProductsPage() {
     // Thay localhost bằng 127.0.0.1 để fix lỗi fetch của Node.js
-    const res = await fetch('http://127.0.0.1:8000/products', {
+    const baseUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+    const res = await fetch(`${baseUrl}/products`, {
         cache: 'no-store'
     });
 

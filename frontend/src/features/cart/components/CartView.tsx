@@ -127,6 +127,14 @@ export function CartView() {
                     {item.name}
                   </h2>
 
+                  {(item.size || item.toppings?.length) ? (
+                    <p className="mt-1 text-xs text-gray-500">
+                      {item.size ? `Size ${item.size}` : ''}
+                      {item.size && item.toppings?.length ? ' - ' : ''}
+                      {item.toppings?.length ? `Topping: ${item.toppings.join(', ')}` : ''}
+                    </p>
+                  ) : null}
+
                   <p className="mt-1 text-sm text-gray-500">
                     {formatVND(item.unitPrice)} / sản phẩm
                   </p>

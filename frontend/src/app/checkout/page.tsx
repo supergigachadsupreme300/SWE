@@ -45,7 +45,7 @@ export default function CheckoutPage() {
   // Load cart from localStorage or fallback to initial items
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('brewlite_cart') || localStorage.getItem('brewlite:cart')
+      const stored = localStorage.getItem('brewlite_cart') || localStorage.getItem('brewlite:cart') || localStorage.getItem('brewlite-cart')
       if (stored) {
         const parsed = JSON.parse(stored)
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -56,6 +56,7 @@ export default function CheckoutPage() {
             price: Number(item.price) || 45000,
             quantity: Number(item.quantity) || 1,
             size: item.size || 'M',
+            toppings: Array.isArray(item.toppings) ? item.toppings : [],
             lineTotal: (Number(item.price) || 45000) * (Number(item.quantity) || 1),
           }))
           setItems(normalized)
@@ -146,6 +147,7 @@ export default function CheckoutPage() {
         productId: it.productId,
         quantity: it.quantity,
         size: it.size,
+        toppings: it.toppings,
         unitPrice: it.price,
         lineTotal: it.lineTotal,
       })),

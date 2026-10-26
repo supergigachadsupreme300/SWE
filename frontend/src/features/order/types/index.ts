@@ -27,6 +27,7 @@ export interface OrderItem {
   price: number
   quantity: number
   size?: CoffeeSize | string
+  toppings?: string[]
   lineTotal: number
 }
 
@@ -34,6 +35,7 @@ export interface OrderItemPayload {
   productId: string
   quantity: number
   size?: string
+  toppings?: string[]
   unitPrice: number
   lineTotal: number
 }
@@ -60,6 +62,7 @@ export interface OrderItemDetail {
   productId: string
   quantity: number
   size?: string | null
+  toppings?: string | null
   unitPrice: number
   lineTotal: number
   product?: {

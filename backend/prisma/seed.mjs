@@ -3,9 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-})
+const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Đang nạp dữ liệu mẫu (Seed Data) vào cơ sở dữ liệu BrewLite...')
