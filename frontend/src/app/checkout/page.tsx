@@ -12,6 +12,7 @@ import {
   PaymentMethod,
   OrderCreatePayload,
 } from '../../features/order'
+import { useCartStore } from '../../features/cart'
 
 // Sample initial cart items for testing and review
 const INITIAL_CART_ITEMS: OrderItem[] = [
@@ -42,13 +43,31 @@ export default function CheckoutPage() {
 
   const { submitOrder, isLoading, error, order, isSuccess, reset } = useCreateOrder()
 
-  // Load cart from localStorage or fallback to initial items
+  // Load cart from cart store/localStorage or fallback to initial items
   useEffect(() => {
     try {
+      const storeItems = useCartStore.getState().items
+      if (Array.isArray(storeItems) && storeItems.length > 0) {
+        const normalized = storeItems.map((item: any, idx: number) => ({
+          productId: item.productId || `prod_${idx}`,
+          name: item.name || 'Cà Phê BrewLite',
+          imageUrl: item.imageUrl,
+          price: Number(item.unitPrice) || 45000,
+          quantity: Number(item.quantity) || 1,
+          size: item.size || 'M',
+          toppings: Array.isArray(item.toppings) ? item.toppings : [],
+          lineTotal: (Number(item.unitPrice) || 45000) * (Number(item.quantity) || 1),
+        }))
+        setItems(normalized)
+        setIsLoaded(true)
+        return
+      }
+
       const stored = localStorage.getItem('brewlite_cart') || localStorage.getItem('brewlite:cart') || localStorage.getItem('brewlite-cart')
       if (stored) {
-        const parsed = JSON.parse(stored)
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        const raw = JSON.parse(stored)
+        const parsed = Array.isArray(raw) ? raw : Array.isArray(raw?.state?.items) ? raw.state.items : []
+        if (parsed.length > 0) {
           const normalized = parsed.map((item: any, idx: number) => ({
             productId: item.productId || item.id || `prod_${idx}`,
             name: item.name || item.title || 'Cà Phê BrewLite',

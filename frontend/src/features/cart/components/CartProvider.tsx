@@ -44,7 +44,7 @@ export function CartProvider({
         {
           productId: product.id,
           name: product.name,
-          unitPrice: product.price,
+          unitPrice: request.unitPrice ?? product.price,
           stock: product.stock,
           imageUrl: product.images[0] ?? null,
         },
