@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common'
+import { Controller, Get, Post, Patch, Body, Param, Req, UseGuards } from '@nestjs/common'
 import { OrdersService } from './orders.service'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
 
 @Controller('orders')
 export class OrdersController {
@@ -10,6 +11,12 @@ export class OrdersController {
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findMine(@Req() req: any) {
+    return this.ordersService.findAll(req.user?.id)
   }
 
   @Get(':id')

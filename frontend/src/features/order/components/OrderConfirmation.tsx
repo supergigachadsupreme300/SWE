@@ -138,6 +138,13 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
         {/* Action Buttons: Bridge to Member 6 Payment & Order New */}
         <div className="pt-4 space-y-3">
+          <Link
+            href="/orders"
+            className="block w-full py-3 px-4 rounded-xl border border-amber-200 bg-amber-50 text-center text-sm font-semibold text-amber-900 hover:bg-amber-100 transition-colors"
+          >
+            Xem lịch sử đơn hàng
+          </Link>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href={`/payment?orderId=${order.id}&amount=${order.total}`}

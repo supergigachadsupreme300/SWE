@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import type { OrderCreatePayload, OrderDetail } from '../types'
 import { createOrder } from '../services/orderApi'
+import { useCartStore } from '../../cart/stores/cartStore'
 
 interface UseCreateOrderResult {
   submitOrder: (payload: OrderCreatePayload) => Promise<OrderDetail | null>
@@ -28,6 +29,7 @@ export function useCreateOrder(): UseCreateOrderResult {
       }
 
       const created = await createOrder(payload)
+      useCartStore.getState().clearCart()
       setOrder(created)
       setIsSuccess(true)
 
@@ -36,6 +38,7 @@ export function useCreateOrder(): UseCreateOrderResult {
         try {
           localStorage.removeItem('brewlite_cart')
           localStorage.removeItem('brewlite:cart')
+          localStorage.removeItem('brewlite-cart')
           window.dispatchEvent(new CustomEvent('brewlite:cart-cleared'))
         } catch {
           // ignore

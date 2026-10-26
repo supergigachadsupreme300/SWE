@@ -23,7 +23,9 @@ function getLocalOrders(): OrderDetail[] {
  */
 export async function fetchOrderHistory(): Promise<OrderDetail[]> {
   try {
-    const response = await apiGet<OrderDetail[]>('/orders')
+    const token = typeof window !== 'undefined' ? localStorage.getItem('brewlite_token') : null
+    const endpoint = token ? '/orders/me' : '/orders'
+    const response = await apiGet<OrderDetail[]>(endpoint, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined)
     const backendOrders = Array.isArray(response) ? response : []
     const localOrders = getLocalOrders()
     const byId = new Map<string, OrderDetail>()
