@@ -30,6 +30,13 @@ export function useCreateOrder(): UseCreateOrderResult {
 
       const created = await createOrder(payload)
       useCartStore.getState().clearCart()
+      if (typeof window !== 'undefined') {
+        try {
+          useCartStore.persist.clearStorage()
+        } catch {
+          // ignore
+        }
+      }
       setOrder(created)
       setIsSuccess(true)
 

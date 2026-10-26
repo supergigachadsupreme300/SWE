@@ -1,12 +1,27 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useCartStore } from '../stores/cartStore'
 
 export function CartBadge() {
   const count = useCartStore(
     (state) => state.getTotalItems(),
   )
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('brewlite_token'))
+  }, [])
+
+  function handleLogout() {
+    localStorage.removeItem('brewlite_token')
+    localStorage.removeItem('brewlite_user_id')
+    setIsLoggedIn(false)
+    window.location.href = '/auth/login'
+  }
+
+  if (!isLoggedIn) return null
 
   return (
     <div className="fixed right-5 top-5 z-50 flex items-center gap-2">
@@ -16,6 +31,13 @@ export function CartBadge() {
       >
         Lịch sử đơn
       </Link>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-red-700"
+      >
+        Đăng xuất
+      </button>
 
       <Link
       href="/cart"

@@ -58,8 +58,19 @@ export function CartProvider({
 
     registerCartBridge(handleAddToCart)
 
+    const handleCartCleared = () => {
+      useCartStore.getState().clearCart()
+      try {
+        useCartStore.persist.clearStorage()
+      } catch {
+        // ignore
+      }
+    }
+    window.addEventListener('brewlite:cart-cleared', handleCartCleared)
+
     return () => {
       unregisterCartBridge()
+      window.removeEventListener('brewlite:cart-cleared', handleCartCleared)
     }
   }, [addItem])
 
