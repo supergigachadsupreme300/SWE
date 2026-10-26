@@ -1,3 +1,5 @@
+import { IsIn, IsOptional, IsString } from 'class-validator'
+
 export type ValidOrderStatus =
   | 'PENDING'
   | 'PAID'
@@ -8,6 +10,18 @@ export type ValidOrderStatus =
   | 'CANCELLED'
 
 export class UpdateOrderStatusDto {
-  status: ValidOrderStatus
+  @IsIn([
+    'PENDING',
+    'PAID',
+    'PREPARING',
+    'READY',
+    'COMPLETED',
+    'PAYMENT_FAILED',
+    'CANCELLED',
+  ])
+  status!: ValidOrderStatus
+
+  @IsOptional()
+  @IsString()
   reason?: string
 }
