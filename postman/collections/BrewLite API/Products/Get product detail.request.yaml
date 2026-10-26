@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/products/{{productId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+      const requestedId = pm.collectionVariables.get('productId');
+
+      pm.test('200 OK', () => pm.response.to.have.status(200));
+      pm.test('returns the requested product', () => {
+        pm.expect(body.id).to.eql(requestedId);
+      });
+      pm.test('product has a numeric price and stock', () => {
+        pm.expect(body.price).to.be.a('number');
+        pm.expect(body.stock).to.be.a('number');
+      });
+    language: text/javascript
+order: 2000

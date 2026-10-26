@@ -1,0 +1,21 @@
+$kind: http-request
+name: Reject invalid transition PAID -> READY
+url: "{{baseUrl}}/orders/{{orderId}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "READY"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('400 Bad Request', () => pm.response.to.have.status(400));
+      pm.test('error name is Bad Request', () => {
+        pm.expect(pm.response.json().error).to.eql('Bad Request');
+      });
+    language: text/javascript
+order: 5000

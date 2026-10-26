@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{baseUrl}}/orders"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "items": [],
+      "total": 0
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('400 Bad Request', () => pm.response.to.have.status(400));
+      pm.test('returns a JSON error message', () => {
+        pm.expect(pm.response.json()).to.have.property('message');
+      });
+    language: text/javascript
+order: 6000

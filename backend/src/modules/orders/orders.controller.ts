@@ -8,8 +8,10 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
+  async create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+    createOrderDto.userId = req.user?.sub || req.user?.id
     return this.ordersService.create(createOrderDto)
   }
 

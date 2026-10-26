@@ -1,0 +1,50 @@
+$kind: http-request
+url: "{{baseUrl}}/orders"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "items": [
+        {
+          "productId": "{{productId}}",
+          "quantity": 1,
+          "size": "M",
+          "unitPrice": {{productUnitPrice}},
+          "lineTotal": {{productUnitPrice}}
+        }
+      ],
+      "total": {{productUnitPrice}},
+      "customerInfo": {
+        "customerName": "Postman Tester",
+        "customerPhone": "0912345678",
+        "pickupType": "AT_COUNTER",
+        "note": "Created by the BrewLite Postman collection"
+      },
+      "paymentMethod": "MOMO"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+
+      pm.test('created (200 or 201)', () => {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+      pm.test('returns an order id', () => {
+        pm.expect(body).to.have.property('id');
+      });
+      pm.test('initial status is PENDING', () => {
+        pm.expect(body.status).to.eql('PENDING');
+      });
+      pm.test('returns the order items', () => {
+        pm.expect(body.items).to.be.an('array').that.is.not.empty;
+      });
+
+      if (body && body.id) {
+        pm.collectionVariables.set('orderId', body.id);
+      }
+    language: text/javascript
+order: 1000

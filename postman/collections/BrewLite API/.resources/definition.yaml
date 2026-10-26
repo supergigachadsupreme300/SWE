@@ -1,0 +1,16 @@
+$kind: collection
+description: |-
+  API tests for the implemented BrewLite backend endpoints.
+
+  Run order: Products -> Orders. The collection stores productId and orderId from responses, but ships with seed defaults so individual folders can run on their own.
+
+  Prerequisites:
+  - PostgreSQL running and seeded (`backend/prisma/seed.mjs`)
+  - Backend running on http://localhost:8000
+
+  Select the `BrewLite Local` environment (or keep the collection baseUrl variable).
+variables:
+  baseUrl: http://localhost:8000
+  productId: prod_macchiato_01
+  productUnitPrice: "49000"
+  orderId: ""

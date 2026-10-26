@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 070f4b0f-a20d-4218-86bb-59eeaaf78376
+
+cloudResources:
+  collections:
+    ../postman/collections/BrewLite API: 508099fb-7b50-4dcc-aafd-d81a418fc75c
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/products/{{productId}}/related?limit=4"
+method: GET
+queryParams:
+  limit: "4"
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+      const productId = pm.collectionVariables.get('productId');
+
+      pm.test('200 OK', () => pm.response.to.have.status(200));
+      pm.test('returns an array', () => {
+        pm.expect(body).to.be.an('array');
+      });
+      pm.test('respects the limit query (max 4)', () => {
+        pm.expect(body.length).to.be.at.most(4);
+      });
+      pm.test('excludes the source product', () => {
+        pm.expect(body.map((product) => product.id)).to.not.include(productId);
+      });
+    language: text/javascript
+order: 3000

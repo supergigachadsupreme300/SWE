@@ -1,0 +1,23 @@
+$kind: http-request
+name: Update order status PENDING -> PAID
+url: "{{baseUrl}}/orders/{{orderId}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "PAID"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+
+      pm.test('200 OK', () => pm.response.to.have.status(200));
+      pm.test('transitioned to PAID', () => {
+        pm.expect(body.status).to.eql('PAID');
+      });
+    language: text/javascript
+order: 4000

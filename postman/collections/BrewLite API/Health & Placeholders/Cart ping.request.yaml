@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/cart"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('200 OK', () => pm.response.to.have.status(200));
+      pm.test('returns cart placeholder message', () => {
+        pm.expect(pm.response.json().message).to.eql('cart placeholder');
+      });
+    language: text/javascript
+order: 2000

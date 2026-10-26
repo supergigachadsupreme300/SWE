@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/products/postman-missing-product"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('404 Not Found', () => pm.response.to.have.status(404));
+      pm.test('returns a JSON error message', () => {
+        pm.expect(pm.response.json()).to.have.property('message');
+      });
+    language: text/javascript
+order: 4000
