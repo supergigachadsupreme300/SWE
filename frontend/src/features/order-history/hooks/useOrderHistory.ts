@@ -28,6 +28,12 @@ export function useOrderHistory() {
     void loadOrders()
   }, [loadOrders])
 
+  useEffect(() => {
+    const handleOrderCreated = () => void loadOrders()
+    window.addEventListener('brewlite:order-created', handleOrderCreated)
+    return () => window.removeEventListener('brewlite:order-created', handleOrderCreated)
+  }, [loadOrders])
+
   const filteredOrders = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase()
     return orders.filter((order) => {

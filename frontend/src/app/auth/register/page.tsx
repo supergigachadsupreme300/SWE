@@ -26,6 +26,7 @@ export default function RegisterPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Đăng ký thất bại')
       localStorage.setItem('brewlite_token', data.accessToken)
+      if (data.user?.id) localStorage.setItem('brewlite_user_id', data.user.id)
       router.push('/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể đăng ký')

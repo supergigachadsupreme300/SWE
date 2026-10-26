@@ -170,6 +170,7 @@ export default function CheckoutPage() {
         unitPrice: it.price,
         lineTotal: it.lineTotal,
       })),
+      userId: typeof window !== 'undefined' ? localStorage.getItem('brewlite_user_id') || undefined : undefined,
       total: grandTotal,
       customerInfo: data.customerInfo,
       paymentMethod: data.paymentMethod,

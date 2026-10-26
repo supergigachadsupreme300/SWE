@@ -40,6 +40,7 @@ export function useCreateOrder(): UseCreateOrderResult {
           localStorage.removeItem('brewlite:cart')
           localStorage.removeItem('brewlite-cart')
           window.dispatchEvent(new CustomEvent('brewlite:cart-cleared'))
+          window.dispatchEvent(new CustomEvent('brewlite:order-created'))
         } catch {
           // ignore
         }
