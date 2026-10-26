@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import type {
   PaymentMethod,
   PaymentPayload,
@@ -9,7 +10,8 @@ import type {
 } from '@/features/payment'
 
 export default function PaymentPage() {
-  const [orderId, setOrderId] = useState('')
+  const searchParams = useSearchParams()
+  const [orderId, setOrderId] = useState(searchParams.get('orderId') || '')
   const [method, setMethod] = useState<PaymentMethod>('WALLET')
   const [result, setResult] = useState<PaymentResult | null>(null)
   const [error, setError] = useState('')

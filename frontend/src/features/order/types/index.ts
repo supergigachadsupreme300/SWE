@@ -79,6 +79,7 @@ export interface OrderDetail {
   total: number
   status: OrderStatus
   customerInfo?: CustomerPickupInfo | null
+  paymentMethod?: PaymentMethod | null
   items: OrderItemDetail[]
   createdAt: string
   updatedAt: string

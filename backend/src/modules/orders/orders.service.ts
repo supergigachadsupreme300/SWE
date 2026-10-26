@@ -82,12 +82,18 @@ export class OrdersService {
       }
 
       // 2. Create Order & OrderItems in PENDING status
-      const createdOrder = await tx.order.create({
-        data: {
-          userId: targetUserId,
-          total: total,
-          status: 'PENDING',
-          items: {
+       const createdOrder = await tx.order.create({
+         data: {
+           userId: targetUserId,
+           total: total,
+           status: 'PENDING',
+           customerName: createOrderDto.customerInfo?.customerName,
+           customerPhone: createOrderDto.customerInfo?.customerPhone,
+           pickupType: createOrderDto.customerInfo?.pickupType,
+           tableNumber: createOrderDto.customerInfo?.tableNumber,
+           note: createOrderDto.customerInfo?.note,
+           paymentMethod: createOrderDto.paymentMethod,
+           items: {
             create: items.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
@@ -120,9 +126,9 @@ export class OrdersService {
         })
       }
 
-      return createdOrder
-    })
-  }
+       return this.toOrderResponse(createdOrder)
+     })
+   }
 
   /**
    * Retrieves order details by ID
@@ -141,12 +147,12 @@ export class OrdersService {
       },
     })
 
-    if (!order) {
-      throw new NotFoundException(`Đơn hàng #${id} không tồn tại.`)
-    }
+     if (!order) {
+       throw new NotFoundException(`Đơn hàng #${id} không tồn tại.`)
+     }
 
-    return order
-  }
+     return this.toOrderResponse(order)
+   }
 
   /**
    * Updates order status with strict lifecycle transition validation using assertTransition
@@ -163,33 +169,55 @@ export class OrdersService {
     // Assert state machine transition
     assertTransition(currentStatus, nextStatus)
 
-    return this.prisma.order.update({
-      where: { id },
-      data: { status: nextStatus },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    })
-  }
+     const updated = await this.prisma.order.update({
+       where: { id },
+       data: { status: nextStatus },
+       include: {
+         items: {
+           include: {
+             product: true,
+           },
+         },
+         user: true,
+         payments: true,
+       },
+     })
+     return this.toOrderResponse(updated)
+   }
 
   /**
    * Lists orders for a user or all orders
    */
-  async findAll(userId?: string) {
-    return this.prisma.order.findMany({
-      where: userId ? { userId } : undefined,
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    })
+   async findAll(userId?: string) {
+     const orders = await this.prisma.order.findMany({
+       where: userId ? { userId } : undefined,
+       include: {
+         items: {
+           include: {
+             product: true,
+           },
+         },
+         user: true,
+         payments: true,
+       },
+       orderBy: { createdAt: 'desc' },
+     })
+     return orders.map((order) => this.toOrderResponse(order))
+   }
+
+  private toOrderResponse(order: any) {
+    return {
+      ...order,
+      customerInfo: order.customerName
+        ? {
+            customerName: order.customerName,
+            customerPhone: order.customerPhone,
+            pickupType: order.pickupType,
+            tableNumber: order.tableNumber,
+            note: order.note,
+          }
+        : null,
+      paymentMethod: order.paymentMethod ?? null,
+    }
   }
 }

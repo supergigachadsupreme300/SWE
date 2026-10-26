@@ -53,8 +53,25 @@ export function OrderHistoryDetail({ order }: { order: OrderDetail }) {
                 <p className="mt-1 text-sm text-stone-700">{order.customerInfo.note}</p>
               </div>
             )}
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-stone-500">Phương thức thanh toán</p>
+              <p className="mt-1 font-semibold text-stone-800">
+                {order.paymentMethod === 'MOMO' ? 'MoMo' : order.paymentMethod === 'CARD' ? 'Thẻ' : order.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Chưa chọn'}
+              </p>
+            </div>
           </div>
         </header>
+
+        {(order.status === 'PENDING' || order.status === 'PAYMENT_FAILED') && (
+          <div className="mt-5">
+            <Link
+              href={`/payment?orderId=${order.id}`}
+              className="inline-flex rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
+            >
+              Thanh toán đơn hàng
+            </Link>
+          </div>
+        )}
 
         <section className="mt-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-extrabold">Sản phẩm trong đơn</h2>

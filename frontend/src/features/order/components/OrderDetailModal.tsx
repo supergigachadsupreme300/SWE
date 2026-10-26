@@ -216,23 +216,33 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
 
           {/* Thông tin khách hàng & Bàn/Quầy */}
-          {order.customerInfo && (
-            <div className="text-xs space-y-1.5 p-4 rounded-2xl border border-stone-200 bg-stone-50/50">
-              <p className="font-bold text-stone-900 text-sm">📍 Thông tin nhận tại quầy</p>
-              <p className="text-stone-700 font-medium">
-                Khách hàng: {order.customerInfo.customerName} • {order.customerInfo.customerPhone}
-              </p>
-              <p className="text-stone-600">
-                Hình thức:{' '}
-                {order.customerInfo.pickupType === 'DINE_IN'
-                  ? `Dùng tại quán (${order.customerInfo.tableNumber || 'Bàn chưa ghi'})`
-                  : 'Mang đi (Take-away nhận tại quầy)'}
-              </p>
-              {order.customerInfo.note && (
-                <p className="italic text-stone-500">Ghi chú: {order.customerInfo.note}</p>
-              )}
-            </div>
-          )}
+            {order.customerInfo && (
+              <div className="text-xs space-y-1.5 p-4 rounded-2xl border border-stone-200 bg-stone-50/50">
+                <p className="font-bold text-stone-900 text-sm">📍 Thông tin nhận tại quầy</p>
+                <p className="text-stone-700 font-medium">
+                  Khách hàng: {order.customerInfo.customerName} • {order.customerInfo.customerPhone}
+                </p>
+                <p className="text-stone-600">
+                  Hình thức:{' '}
+                  {order.customerInfo.pickupType === 'DINE_IN'
+                    ? `Dùng tại quán (${order.customerInfo.tableNumber || 'Bàn chưa ghi'})`
+                    : 'Mang đi (Take-away nhận tại quầy)'}
+                </p>
+                {order.customerInfo.note && (
+                  <p className="italic text-stone-500">Ghi chú: {order.customerInfo.note}</p>
+                )}
+                <p className="text-stone-600">Phương thức: {order.paymentMethod || 'Chưa chọn'}</p>
+              </div>
+            )}
+
+            {(order.status === 'PENDING' || order.status === 'PAYMENT_FAILED') && (
+              <a
+                href={`/payment?orderId=${order.id}`}
+                className="inline-flex rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700"
+              >
+                Thanh toán đơn hàng
+              </a>
+            )}
 
           {/* Danh sách món */}
           <div className="space-y-3">
