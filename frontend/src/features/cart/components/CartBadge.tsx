@@ -11,13 +11,21 @@ export function CartBadge() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem('brewlite_token'))
+    const sync = () => setIsLoggedIn(!!localStorage.getItem('brewlite_token'))
+    sync()
+    window.addEventListener('storage', sync)
+    window.addEventListener('brewlite:auth-changed', sync)
+    return () => {
+      window.removeEventListener('storage', sync)
+      window.removeEventListener('brewlite:auth-changed', sync)
+    }
   }, [])
 
   function handleLogout() {
     localStorage.removeItem('brewlite_token')
     localStorage.removeItem('brewlite_user_id')
     setIsLoggedIn(false)
+    window.dispatchEvent(new CustomEvent('brewlite:auth-changed'))
     window.location.href = '/auth/login'
   }
 

@@ -26,6 +26,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại')
       localStorage.setItem('brewlite_token', data.accessToken)
       if (data.user?.id) localStorage.setItem('brewlite_user_id', data.user.id)
+      window.dispatchEvent(new CustomEvent('brewlite:auth-changed'))
       router.push('/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể đăng nhập')
