@@ -1,6 +1,5 @@
 import { apiGet } from '../../../services/api'
 import type { ProductDetail, RelatedProduct } from '../types'
-import { getMockProduct, getMockRelatedProducts, isMockEnabled } from './mockProductDetail'
 import { normalizeProductDetail, normalizeRelatedProducts } from './normalize'
 
 export class ProductDetailNotFoundError extends Error {
@@ -14,10 +13,7 @@ export async function fetchProductDetail(id: string): Promise<ProductDetail> {
   try {
     return normalizeProductDetail(await apiGet(`/products/${encodeURIComponent(id)}`), id)
   } catch (error) {
-    if (!isMockEnabled()) throw error
-    const fallback = getMockProduct(id)
-    if (!fallback) throw new ProductDetailNotFoundError(id)
-    return fallback
+    throw error
   }
 }
 
@@ -28,7 +24,6 @@ export async function fetchRelatedProducts(id: string, limit = 4): Promise<Relat
     )
     return related
   } catch (error) {
-    if (!isMockEnabled()) throw error
-    return getMockRelatedProducts(id, limit)
+    throw error
   }
 }
