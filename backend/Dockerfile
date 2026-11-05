@@ -1,7 +1,8 @@
 FROM node:18-alpine
 WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
-RUN npm install --production=false || true
+RUN npm install --production=false
 COPY . .
+RUN npx prisma generate
 EXPOSE 8000
 CMD ["npm", "run", "start:dev"]
